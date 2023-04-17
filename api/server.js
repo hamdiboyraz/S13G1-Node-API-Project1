@@ -39,10 +39,11 @@ server.post("/api/users", (req, res) => {
   controller
     .insert(req.body)
     .then((newUser) => {
-      res.status(201).json({
-        message: "Kullanıcı başarıyla oluşturuldu",
-        data: newUser,
-      });
+      // res.status(201).json({
+      //   message: "Kullanıcı başarıyla oluşturuldu",
+      //   data: newUser,
+      // });
+      res.status(201).json(newUser);
     })
     .catch((err) => {
       res
@@ -84,7 +85,8 @@ server.delete("/api/users/:id", (req, res) => {
           .status(404)
           .json({ message: "Belirtilen ID'li kullanıcı bulunamadı" });
       }
-      return res.status(204).json(deletedUser); // won't seen because 204 means no content
+      // return res.status(204).json(deletedUser); // won't seen because 204 means no content
+      return res.json(deletedUser);
     })
     .catch((err) => {
       console.error(err);
@@ -93,7 +95,29 @@ server.delete("/api/users/:id", (req, res) => {
 });
 
 // UPDATE user
-server.put("/api/users/:id");
+server.put("/api/users/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, bio } = req.body;
+  if (!name || !bio) {
+    return res
+      .status(400)
+      .json({ message: "Lütfen kullanıcı için name ve bio sağlayın" });
+  }
+  controller
+    .update(id, req.body)
+    .then((updatedUser) => {
+      if (!updatedUser) {
+        return res
+          .status(404)
+          .json({ message: "Belirtilen ID'li kullanıcı bulunamadı" });
+      }
+      return res.status(200).json(updatedUser);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: "Kullanıcı bilgileri güncellenemedi" });
+    });
+});
 
 // EXPORT
 module.exports = server; // SERVERINIZI EXPORT EDİN {}
