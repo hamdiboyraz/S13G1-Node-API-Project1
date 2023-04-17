@@ -51,7 +51,27 @@ server.post("/api/users", (req, res) => {
     });
 });
 
-server.get("/api/users/:id");
+server.get("/api/users/:id", (req, res) => {
+  console.log(req.params.id);
+  const { id } = req.params;
+  console.log(id);
+
+  controller
+    .findById(id)
+    .then((user) => {
+      if (!user) {
+        return res
+          .status(404)
+          .json({ message: "Belirtilen ID'li kullanıcı bulunamadı" });
+      }
+      res.status(200).json(user);
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: "Kullanıcı bilgisi alınamadı" });
+    });
+});
+
 server.delete("/api/users/:id");
 server.put("/api/users/:id");
 
